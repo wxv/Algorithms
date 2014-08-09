@@ -1,3 +1,5 @@
+// C++ / GMP integer implementation
+
 #include <boost/multiprecision/gmp.hpp>
 #include <iostream>
 
@@ -56,14 +58,14 @@ inline int mpz_log(mpz_int z, int base)
 mpz_int toom_cook(mpz_int m, mpz_int n)
 {
     mpz_int threshold;
-    mpz_ui_pow_ui(threshold.backend().data(), 2, 1000);
+    mpz_ui_pow_ui(threshold.backend().data(), 2, 1000); // 2^1000
     if (m < threshold and n < threshold)
     {
         return m * n;
     }
 
-    int k = 3; // Toom-3
-    int b = 10000; // Radix (large value)
+    const int k = 3; // Toom-3
+    int b = 1073741824; // 2^30, radix (large value)
 
     int i = std::max(mpz_log(m,b)/k, mpz_log(n,b)/k) + 1;
     mpz_int B;
@@ -92,11 +94,12 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
     mpz_int q_neg2 = n0 - 2*n1 + 4*n2;
     mpz_int q_inf = n2;
 
-    mpz_int r_0 = p_0 * q_0;
-    mpz_int r_1 = p_1 * q_1;
-    mpz_int r_neg1 = p_neg1 * q_neg1;
-    mpz_int r_neg2 = p_neg2 * q_neg2;
-    mpz_int r_inf = p_inf * q_inf;
+    // Pointwise multiplication
+    mpz_int r_0 = toom_cook(p_0, q_0);
+    mpz_int r_1 = toom_cook(p_1, q_1);
+    mpz_int r_neg1 = toom_cook(p_neg1, q_neg1);
+    mpz_int r_neg2 = toom_cook(p_neg2, q_neg2);
+    mpz_int r_inf = toom_cook(p_inf, q_inf);
 
     // Solving matrix equations (see README)
     // Multiply by inverted matrix
@@ -108,27 +111,28 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
     mpz_int r4 =                                        r_inf;
 
 
-
     return r0 + B*r1 + B*B*r2 + B*B*B*r3 + B*B*B*B*r4;
 }
 
 int main()
 {
+    // Test numbers
     // 120 digit multiplicands
-    const mpz_int x("461516004148971847450687728295051520819348189617713693620405"
-                    "788622839733880667131021616145113142692185715868681960426769");
-    const mpz_int y("396661689878051280981368038664785226063044063812328363811774"
-                    "037291571915163134758418523492009331471439729019296250138507");
+    // const mpz_int x("461516004148971847450687728295051520819348189617713693620405"
+    //                "788622839733880667131021616145113142692185715868681960426769");
+    // const mpz_int y("396661689878051280981368038664785226063044063812328363811774"
+    //                "037291571915163134758418523492009331471439729019296250138507");
     // x * y = 183065718111...73609080493883
-
 
     // mpz_int m("1234567890123456789012");
     // mpz_int n("987654321987654321098");
 
+    mpz_int f, g;
+    mpz_ui_pow_ui(f.backend().data(), 3, 150000); // 3^150000, 71569 digits
+    mpz_ui_pow_ui(g.backend().data(), 5, 100000); // 5^100000, 69898 digits
 
 
-    std::cout << toom_cook(x, y) << std::endl;
-
+    mpz_int result = toom_cook(f, g);
 
     return 0;
 }
