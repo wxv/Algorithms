@@ -1,5 +1,3 @@
-// C++ / GMP integer implementation
-
 #include <boost/multiprecision/gmp.hpp>
 #include <iostream>
 
@@ -14,39 +12,11 @@ typedef number<gmp_int >         mpz_int;
 }}
 
 
-// Karatsuba's O(n^(log_2(3))) algorithm
-mpz_int karatsuba(mpz_int x, mpz_int y)
-{
-    mpz_int threshold;
-    mpz_ui_pow_ui(threshold.backend().data(), 2, 400); // 2^400
-    if (x < threshold and y < threshold)
-    {
-        return x * y;
-    }
-
-    int m = std::max(msb(x), msb(y));
-    int m2 = m / 2;
-
-    mpz_int mask = 1;
-    mask = (mask << m2) - 1;
-    mpz_int xlow = x & mask;
-    mpz_int ylow = y & mask;
-    mpz_int xhigh = x >> m2;
-    mpz_int yhigh = y >> m2;
-
-    mpz_int a = karatsuba(xhigh, yhigh);
-    mpz_int b = karatsuba(xlow + xhigh, ylow + yhigh);
-    mpz_int c = karatsuba(xlow, ylow);
-    mpz_int d = b - a - c;
-
-    return (((a << m2) + d) << m2) + c;
-}
-
-// GMP does not have logarithm??
-inline int mpz_log(mpz_int z, int base)
+// GMP does not have logarithm?
+inline int mpz_log(mpz_int z, int base) // floor(log)
 {
     int count = 0;
-    while (z >= base) // floor(log)
+    while (z >= base)
     {
         z /= base;
         ++count;
@@ -54,7 +24,15 @@ inline int mpz_log(mpz_int z, int base)
     return count;
 }
 
-// Toom-3 based on Wikipedia's implementation
+/* Toom-3 based on Wikipedia's implementation. Method of multiplying by splitting
+ * up numbers into `k` parts (in this case, 3). In Toom-3, this reduces 9
+ * multiplications to 5. The method used is described by Marco Bodrato. The digits
+ * are split and turned into 2 polynomials. Then the polynomials are evaluated at
+ * several points, the points are multiplied, and a new polynomial is interpolated
+ * based on an inverted matrix. Finally the result is recomposed from the new
+ * polynomial. Optimal matrices for `k` are described at
+ * http://www.csd.uwo.ca/~eschost/Exam/WhatAboutToomCookMatricesOptimality.pdf
+ */
 mpz_int toom_cook(mpz_int m, mpz_int n)
 {
     mpz_int threshold;
@@ -65,7 +43,7 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
     }
 
     const int k = 3; // Toom-3
-    int b = 1073741824; // 2^30, radix (large value)
+    const int b = 1073741824; // 2^30, radix (large value)
 
     int i = std::max(mpz_log(m,b)/k, mpz_log(n,b)/k) + 1;
     mpz_int B;
@@ -101,14 +79,14 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
     mpz_int r_neg2 = toom_cook(p_neg2, q_neg2);
     mpz_int r_inf = toom_cook(p_inf, q_inf);
 
-    // Solving matrix equations (see README)
+    // Solving matrix equations
     // Multiply by inverted matrix
 
     mpz_int r0 = r_0;
-    mpz_int r1 = r_0/2  + r_1/3 - r_neg1    + r_neg2/6  + r_inf;
-    mpz_int r2 = -r_0   + r_1/2 + r_neg1/2              - r_inf;
-    mpz_int r3 = -r_0/2 + r_1/6 + r_neg1/2  - r_neg2/6  + 2*r_inf;
-    mpz_int r4 =                                        r_inf;
+    mpz_int r1 = r_0/2 + r_1/3 - r_neg1 + r_neg2/6 + r_inf;
+    mpz_int r2 = -r_0 + r_1/2 + r_neg1/2 - r_inf;
+    mpz_int r3 = -r_0/2 + r_1/6 + r_neg1/2 - r_neg2/6 + 2*r_inf;
+    mpz_int r4 = r_inf;
 
 
     return r0 + B*r1 + B*B*r2 + B*B*B*r3 + B*B*B*B*r4;
@@ -116,21 +94,9 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
 
 int main()
 {
-    // Test numbers
-    // 120 digit multiplicands
-    // const mpz_int x("461516004148971847450687728295051520819348189617713693620405"
-    //                "788622839733880667131021616145113142692185715868681960426769");
-    // const mpz_int y("396661689878051280981368038664785226063044063812328363811774"
-    //                "037291571915163134758418523492009331471439729019296250138507");
-    // x * y = 183065718111...73609080493883
-
-    // mpz_int m("1234567890123456789012");
-    // mpz_int n("987654321987654321098");
-
     mpz_int f, g;
     mpz_ui_pow_ui(f.backend().data(), 3, 150000); // 3^150000, 71569 digits
     mpz_ui_pow_ui(g.backend().data(), 5, 100000); // 5^100000, 69898 digits
-
 
     mpz_int result = toom_cook(f, g);
 
