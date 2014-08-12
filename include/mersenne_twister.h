@@ -1,8 +1,11 @@
-#include <iostream>
+#ifndef MERSENNE_TWISTER_H
+#define MERSENNE_TWISTER_H
+
 #include <time.h>
 
 /* Mersenne Twister is a widely used PRNG. It provides fast generation of high
  * quality pseudo-random integers. Based on Wikipedia's pseudocode.
+ * The following is MT19937, with a period of 2^19937 - 1.
  */
 
  unsigned int MT[624];  // Array for generator
@@ -50,14 +53,4 @@ void generate_numbers()
     }
 }
 
-
- int main()
- {
-     initialize_generator(time(NULL));
-     for(int i=0; i<20; i++)
-     {
-         std::cout << extract_number() << '\n';
-     }
-
-     return 0;
- }
+#endif // MERSENNE_TWISTER_H

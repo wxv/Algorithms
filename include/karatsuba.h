@@ -1,5 +1,8 @@
+#ifndef KARATSUBA_H
+#define KARATSUBA_H
+
 #include <boost/multiprecision/gmp.hpp>
-#include <iostream>
+
 
 using namespace boost::multiprecision;
 
@@ -44,16 +47,4 @@ mpz_int karatsuba(mpz_int x, mpz_int y)
     return (((a << m2) + d) << m2) + c;
 }
 
-int main()
-{
-    // 120 digit multiplicands
-    const mpz_int x("461516004148971847450687728295051520819348189617713693620405"
-                    "788622839733880667131021616145113142692185715868681960426769");
-    const mpz_int y("396661689878051280981368038664785226063044063812328363811774"
-                    "037291571915163134758418523492009331471439729019296250138507");
-    // x * y = 183065718111...73609080493883
-
-    std::cout << karatsuba(x, y) << std::endl;
-
-    return 0;
-}
+#endif // KARATSUBA_H

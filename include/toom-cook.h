@@ -1,5 +1,8 @@
+// Note: replaced "-" with "_" in define
+#ifndef TOOM_COOK_H
+#define TOOM_COOK_H
+
 #include <boost/multiprecision/gmp.hpp>
-#include <iostream>
 
 using namespace boost::multiprecision;
 
@@ -42,7 +45,7 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
         return m * n;
     }
 
-    const int k = 3; // Toom-3
+    #define k 3 // Toom-3
     const int b = 1073741824; // 2^30, radix (large value)
 
     int i = std::max(mpz_log(m,b)/k, mpz_log(n,b)/k) + 1;
@@ -92,14 +95,4 @@ mpz_int toom_cook(mpz_int m, mpz_int n)
     return r0 + B*r1 + B*B*r2 + B*B*B*r3 + B*B*B*B*r4;
 }
 
-int main()
-{
-    mpz_int f, g;
-    mpz_ui_pow_ui(f.backend().data(), 3, 150000); // 3^150000, 71569 digits
-    mpz_ui_pow_ui(g.backend().data(), 5, 100000); // 5^100000, 69898 digits
-
-    mpz_int result = toom_cook(f, g);
-
-    return 0;
-}
-
+#endif // TOOM
