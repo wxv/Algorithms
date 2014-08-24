@@ -9,7 +9,9 @@ Algorithms
 - Toom-Cook multiplication
 - Mersenne Twister
 - MD5
-
+- Linear congruential generator
+- Euclidean algorithm
+- Binary GCD algorithm
 
 
 
