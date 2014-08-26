@@ -4,8 +4,6 @@
 
 #include <boost/multiprecision/gmp.hpp>
 
-#define MAX(a, b) ((a > b) ? a : b)
-
 using namespace boost::multiprecision;
 
 namespace boost{ namespace multiprecision{
@@ -13,9 +11,7 @@ namespace boost{ namespace multiprecision{
 class gmp_int;
 
 typedef number<gmp_int >         mpz_int;
-
 }}
-
 
 // GMP does not have logarithm?
 inline int mpz_log(mpz_int z, int base) // floor(log)
@@ -55,12 +51,13 @@ inline mpz_int rshift(mpz_int n, int b)
  */
 mpz_int toom_3(mpz_int m, mpz_int n)
 {
+    // naive is broken
     const bool use_naive = false;
 
     mpz_int threshold;
     mpz_ui_pow_ui(threshold.backend().data(), 2, 1000); // 2^1000
     if (m < threshold && n < threshold)
-        return (m * n);
+        return m * n;
 
     const int k = 3; // Toom-3
     const int b = 1073741824; // 2^30, radix (large value)
@@ -71,27 +68,23 @@ mpz_int toom_3(mpz_int m, mpz_int n)
 
     mpz_int m0 = m % B; // First base B digits
     mpz_int m1 = (m/B) % B; // Next base B digits
-    mpz_int m2 = (m/B/B) % B; // Leftover
+    mpz_int m2 = m/B/B; // Leftover
     mpz_int n0 = n % B;
     mpz_int n1 = (n/B) % B;
-    mpz_int n2 = (n/B/B) % B;
+    mpz_int n2 = n/B/B;
 
     // p(x) = m2*x^2 + m1*x + m0
     // q(x) = n2*x^2 + n1*x + n0
     // Using points 0, 1, -1, -2, infinity
     if (use_naive)
     {
-        mpz_int p_0 = m0;
-        mpz_int p_1 = m0 + m1 + m2;
-        mpz_int p_neg1 = m0 - m1 + m2;
-        mpz_int p_neg2 = m0 - 2*m1 + 4*m2;
-        mpz_int p_inf = m2;
+        mpz_int p_0, p_1, p_neg1, p_neg2, p_inf, q_0, q_1, q_neg1, q_neg2, q_inf;
+        p_0 = m0;                   q_0 = n0;
+        p_1 = m0 + m1 + m2;         q_1 = n0 + n1 + n2;
+        p_neg1 = m0 - m1 + m2;      q_neg1 = n0 - n1 + n2;
+        p_neg2 = m0 - 2*m1 + 4*m2;  q_neg2 = n0 - 2*n1 + 4*n2;
+        p_inf = m2;                 q_inf = n2;
 
-        mpz_int q_0 = n0;
-        mpz_int q_1 = n0 + n1 + n2;
-        mpz_int q_neg1 = n0 - n1 + n2;
-        mpz_int q_neg2 = n0 - 2*n1 + 4*n2;
-        mpz_int q_inf = n2;
 
         // Pointwise multiplication
         mpz_int r_0 = toom_3(p_0, q_0);
@@ -102,10 +95,10 @@ mpz_int toom_3(mpz_int m, mpz_int n)
 
         // Solving matrix equations by multiplying by inverted matrix
         mpz_int r0 = r_0;
-        mpz_int r1 = r_0/2 + r_1/3 - r_neg1 + r_neg2/6 + r_inf;
-        mpz_int r2 = -r_0 + r_1/2 + r_neg1/2 - r_inf;
-        mpz_int r3 = -r_0/2 + r_1/6 + r_neg1/2 - r_neg2/6 + 2*r_inf;
-        mpz_int r4 = r_inf;
+        mpz_int r1 = r_0/2  + r_1/3     - r_neg1    + r_neg2/6  - 2*r_inf;
+        mpz_int r2 = -r_0   + r_1/2     + r_neg1/2              - r_inf;
+        mpz_int r3 = -r_0/2 + r_1/6     + r_neg1/2  - r_neg2/6  + 2*r_inf;
+        mpz_int r4 =                                                r_inf;
 
 
         return r0 + B*r1 + B*B*r2 + B*B*B*r3 + B*B*B*B*r4;
@@ -125,9 +118,9 @@ mpz_int toom_3(mpz_int m, mpz_int n)
 
         W0 = lshift(W0 + m2, 1) - m0; W4 = lshift(W4 + n2, 1) - n0;
 
-        W3 = W0 * W4;
+        W3 = toom_3(W0, W4);
 
-        W0 = m0 * n0        ; W4 = m2 * n2;
+        W0 = toom_3(m0, n0);        ; W4 = toom_3(m2, n2);
         // Interpolation: 8 add/sub, 3 shift, 1 Sdiv (2n)
         W3 =(W3 - W1)/3;
         W1 =rshift(W1 - W2, 1);
