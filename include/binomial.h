@@ -3,6 +3,8 @@
 
 #include "gmpxx.h"
 
+// GMP's algorithm (does not use prime factorization)
+
 mpz_class mpz_bin(int n, int k)
 {
     mpz_class result = n - k + 1;

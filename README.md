@@ -12,6 +12,8 @@ Algorithms
 - Linear congruential generator
 - Euclidean algorithm
 - Binary GCD algorithm
+- Binomial coefficient 
+- Exponentiation by squaring
 
 
 
