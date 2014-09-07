@@ -24,9 +24,10 @@ int powm(int base, int power, int mod)
     while (power)
     {
         if (power & 1)
-            result = (result * base) % mod;
+            // Prevent overflow
+            result = ((long long)result * (long long)base) % mod;
 
-        base = (base * base) % mod;
+        base = ((long long)base * (long long)base) % mod;
         power >>= 1;
     }
 
