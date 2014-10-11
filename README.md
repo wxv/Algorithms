@@ -1,7 +1,9 @@
 Algorithms
 ==========
 
-A collection of assorted algorithms written in C++. Most are in widespread use.
+A collection of assorted algorithms written mostly in C++. Most are in widespread use.
+
+Note: None of the algorithms are written in C or C#. Some might be in other languages for fun.
 
 Algorithms
 ----------
@@ -19,6 +21,7 @@ Algorithms
   - Binomial coefficient 
 - Exponentiation by squaring
 - Sorting 
-  - Various
+  - Bubble sort
+  - Merge sort
 - Graph theory
   - Coming soon?
