@@ -3,7 +3,7 @@ Algorithms
 
 A collection of assorted algorithms written mostly in C++. Most are in widespread use.
 
-Note: None of the algorithms are written in C or C#. Some might be in other languages for fun.
+Note: None of the algorithms are written in C or Objective-C. Some might be in other languages for fun.
 
 Algorithms
 ----------

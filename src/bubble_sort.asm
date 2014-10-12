@@ -2,17 +2,16 @@
 # https://en.wikipedia.org/wiki/Bubble_sort#Optimizing_bubble_sort
 	.text
 	.globl main
-main:	la	$s0, list	# Load list address
-	li	$s1, 10		# Length of list
+main:	la	$s0, list	# List address
+	li	$s1, 10		# List length
 	
-loop:	li	$t0, 0		# swapped = false
+loop:	li	$t0, 0		# swapped
 	li 	$t1, 1		# for loop "i"
 	
 for:	beq	$t1, $s1, fend	# break if i==length
 	
-	move	$t2, $t1	# Temporary index
-	add	$t2, $t2, $t2	# Multiply by 2 twice
-	add	$t2, $t2, $t2	
+	move	$t2, $t1	# Temp index
+	sll	$t2, $t2, 2	# Multiply by 4
 	add	$t2, $t2, $s0	# Combined address
 	lw	$t3, 0($t2)	# list[i]
 	lw	$t4, -4($t2)	# list[i-1]
@@ -20,9 +19,9 @@ for:	beq	$t1, $s1, fend	# break if i==length
 	addi	$t1, $t1, 1	# i++
 	
 	ble 	$t4, $t3, for	# if list[i-1] > list[i]
-	sw	$t3, -4($t2)	# list[i-1] = temp list[i]
-	sw	$t4, 0($t2)	# list[i] = temp list[i-1]
-	li	$t0, 1		# swapped = true
+	sw	$t3, -4($t2)	# swap and store
+	sw	$t4, 0($t2)	 
+	li	$t0, 1		# swapped=true
 	j	for
 
 fend:	subi 	$s1, $s1, 1	# length--
