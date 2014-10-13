@@ -22,6 +22,7 @@ Algorithms
 - Exponentiation by squaring
 - Sorting 
   - Bubble sort
-  - Merge sort
+  - Quicksort
+  - Heapsort 
 - Graph theory
   - Coming soon?

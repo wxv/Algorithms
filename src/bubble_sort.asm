@@ -10,8 +10,7 @@ loop:	li	$t0, 0		# swapped
 	
 for:	beq	$t1, $s1, fend	# break if i==length
 	
-	move	$t2, $t1	# Temp index
-	sll	$t2, $t2, 2	# Multiply by 4
+	sll	$t2, $t1, 2	# Temp index, multiply by 4
 	add	$t2, $t2, $s0	# Combined address
 	lw	$t3, 0($t2)	# list[i]
 	lw	$t4, -4($t2)	# list[i-1]

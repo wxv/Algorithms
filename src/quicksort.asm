@@ -72,8 +72,6 @@ r2:	bge	$t0, $a1, qend		# i < right
 	
 	lw	$ra, 0($sp)		# Pop ra		
 	addi	$sp, $sp, 4		
-	jr	$ra
-
 
 qend:	jr	$ra
 	
