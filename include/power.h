@@ -20,7 +20,9 @@ long long pow(int base, int power)
 
 int powm(int base, int power, int mod)
 {
+    // Assert (mod - 1)*(mod - 1) does not overflow
     int result = 1;
+    base = base % mod;
     while (power)
     {
         if (power & 1)
