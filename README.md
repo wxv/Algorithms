@@ -15,10 +15,12 @@ Algorithms
   - Linear congruential generator
 - Hash functions
   - MD5
-- Number theory 
+- Number theory
   - Euclidean algorithm
   - Binary GCD algorithm
   - Binomial coefficient 
+  - Fast inverse square root
+  - Square root (Newton's method)
 - Exponentiation by squaring
 - Sorting 
   - Bubble sort
@@ -26,3 +28,4 @@ Algorithms
   - Heapsort 
 - Graph theory
   - Coming soon?
+
