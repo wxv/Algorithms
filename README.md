@@ -28,4 +28,8 @@ Algorithms
   - Heapsort 
 - Graph theory
   - Coming soon?
+  
+Extra
+-----
+- Euler's sum of powers counterexample
 
