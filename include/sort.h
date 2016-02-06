@@ -105,4 +105,20 @@ v_int heap_sort(v_int v)
     return v;
 }
 
+v_int insertion_sort(v_int v)
+{
+    for (int i=1; i<v.size(); i++)
+    {
+        int x = v[i];
+        int j = i-1;
+        while (j >= 0 && v[j] > x)
+        {
+            v[j+1] = v[j];
+            j--;
+        }
+        v[j+1] = x;
+    }
+    return v;
+}
+
 #endif // SORT_H

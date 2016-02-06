@@ -6,7 +6,7 @@
 // Brute force find solution(s) to a^k + b^k + c^k + d^k = e^k, k = 5
 // Current benchmarks:
 // is_perfect_5: 8.2 s
-// in_lookup: 2.5
+// in_lookup: 2.5 s
 
 typedef std::vector<long long> vll;
 
